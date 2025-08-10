@@ -1,0 +1,99 @@
+import java.util.Scanner;
+
+class Video {
+    String title;
+    boolean isRented = false;
+
+    Video(String title) {
+        this.title = title;
+    }
+
+    void rent() {
+        System.out.println(isRented ? title + " is already rented." : title + " has been rented.");
+        isRented = true;
+    }
+
+    void returnVideo() {
+        System.out.println(!isRented ? title + " was not rented." : title + " has been returned.");
+        isRented = false;
+    }
+
+    void display() {
+        System.out.println("Title: " + title + " | Status: " + (isRented ? "Rented" : "Available"));
+    }
+}
+
+public class RentalData {
+    static Video[] inventory = new Video[100];
+    static int count = 0;
+
+    static void perform(String title, String action) {
+        for (int i = 0; i < count; i++) {
+            if (inventory[i].title.equalsIgnoreCase(title)) {
+                switch (action) {
+                    case "rent" -> inventory[i].rent();
+                    case "return" -> inventory[i].returnVideo();
+                    case "remove" -> {
+                        for (int j = i; j < count - 1; j++)
+                            inventory[j] = inventory[j + 1];
+                        inventory[--count] = null;
+                        System.out.println("Removed: " + title);
+                    }
+                }
+                return;
+            }
+        }
+        System.out.println("Video not found.");
+    }
+
+    static void addVideo(String title) {
+        if (count < inventory.length)
+            inventory[count++] = new Video(title);
+        else
+            System.out.println("Inventory full!");
+    }
+
+    static void displayInventory() {
+        if (count == 0)
+            System.out.println("Inventory is empty.");
+        else {
+            System.out.println("\nCurrent Inventory:");
+            for (int i = 0; i < count; i++) inventory[i].display();
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+        String title;
+
+        do {
+            System.out.println("\n--- Video Rental Inventory System ---");
+            System.out.println("1. Add Video  2. Remove Video  3. Rent Video");
+            System.out.println("4. Return Video  5. Display Inventory  6. Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+
+            if (choice >= 1 && choice <= 4) {
+                System.out.print("Enter video title: ");
+                title = sc.nextLine();
+            } else {
+                title = null;
+            }
+
+            switch (choice) {
+                case 1 -> addVideo(title);
+                case 2 -> perform(title, "remove");
+                case 3 -> perform(title, "rent");
+                case 4 -> perform(title, "return");
+                case 5 -> displayInventory();
+                case 6 -> System.out.println("Exiting system...");
+                default -> System.out.println("Invalid choice.");
+            }
+
+        } while (choice != 0);
+
+        sc.close();
+    }
+}
