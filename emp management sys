@@ -1,0 +1,119 @@
+import java.io.*;
+import java.util.*;
+
+class Employee {
+    private String empId;
+    private String name;
+    private String designation;
+    private double salary;
+
+    public Employee(String empId, String name, String designation, double salary) {
+        this.empId = empId;
+        this.name = name;
+        this.designation = designation;
+        this.salary = salary;
+    }
+
+    // Convert Employee object to a line for file
+    public String toFileFormat() {
+        return empId + "," + name + "," + designation + "," + salary;
+    }
+
+    // Read Employee object from a line
+    public static Employee fromFileFormat(String line) {
+        String[] parts = line.split(",");
+        if (parts.length == 4) {
+            return new Employee(parts[0], parts[1], parts[2], Double.parseDouble(parts[3]));
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ID: %-10s Name: %-15s Designation: %-15s Salary: %.2f",
+                empId, name, designation, salary);
+    }
+}
+
+public class EmployeeManagement {
+    private static final String FILE_NAME = "employees.txt";
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        int choice;
+        do {
+            System.out.println("\n==== Employee Management System ====");
+            System.out.println("1. Add Employee");
+            System.out.println("2. Display All Employees");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+
+            while (!scanner.hasNextInt()) { // input validation
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.next();
+            }
+            choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    addEmployee();
+                    break;
+                case 2:
+                    displayEmployees();
+                    break;
+                case 3:
+                    System.out.println("Exiting the program. Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        } while (choice != 3);
+    }
+
+    private static void addEmployee() {
+        try (FileWriter writer = new FileWriter(FILE_NAME, true)) {
+            System.out.print("Enter Employee ID: ");
+            String empId = scanner.nextLine();
+            System.out.print("Enter Employee Name: ");
+            String name = scanner.nextLine();
+            System.out.print("Enter Designation: ");
+            String designation = scanner.nextLine();
+            System.out.print("Enter Salary: ");
+
+            while (!scanner.hasNextDouble()) {
+                System.out.println("Invalid salary! Please enter a valid number.");
+                scanner.next();
+            }
+            double salary = scanner.nextDouble();
+            scanner.nextLine(); // consume newline
+
+            Employee emp = new Employee(empId, name, designation, salary);
+            writer.write(emp.toFileFormat() + "\n");
+            System.out.println("✅ Employee details saved successfully!");
+        } catch (IOException e) {
+            System.out.println(" Error writing to file: " + e.getMessage());
+        }
+    }
+
+    private static void displayEmployees() {
+        File file = new File(FILE_NAME);
+        if (!file.exists() || file.length() == 0) {
+            System.out.println("⚠ No employee records found.");
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            System.out.println("\n==== Employee Details ====");
+            while ((line = reader.readLine()) != null) {
+                Employee emp = Employee.fromFileFormat(line);
+                if (emp != null) {
+                    System.out.println(emp);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(" Error reading from file: " + e.getMessage());
+        }
+    }
+}
