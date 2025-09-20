@@ -1,0 +1,24 @@
+import java.util.HashSet;
+import java.util.Set;
+
+public class setinterface {
+    public static void main(String[] args) {
+        //HashSet
+        Set<String> fruits = new HashSet<>();
+
+        fruits.add("Apple");
+        fruits.add("Banana");
+        fruits.add("Orange");
+        fruits.add("Apple"); // Duplicate, will not be added
+
+        System.out.println("Fruits in the Set:");
+        for (String fruit : fruits) {
+            System.out.println(fruit);
+        }
+        fruits.remove("Banana");
+        System.out.println("\nAfter removing 'Banana':");
+        System.out.println(fruits);
+
+        System.out.println("\nDoes the set contain 'Apple'? " + fruits.contains("Apple"));
+    }
+}
